@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Minha Agenda">
+<meta name="theme-color" content="#b5546f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Minha Agenda</title>
+<style>
+:root{--bg:#faf7f6;--sf:#fff;--tx:#2b2326;--mu:#8a7d82;--ac:#b5546f;--ac2:#f6e3e9;--bd:#eadfe2;--ok:#e9f5ee;--okt:#2d7a4f;--rd:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#171214;--sf:#241c1f;--tx:#f3eaed;--mu:#a1949a;--ac:#e07a96;--ac2:#3a2530;--bd:#3a2e32;--ok:#1c2a22;--okt:#6fcf97;--rd:#ff7b6b}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.4 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding-bottom:110px}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding:12px 16px 8px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.top{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:22px;margin:0}
+.ib{background:none;border:0;font-size:22px;color:var(--tx);padding:8px;min-width:44px;min-height:44px}
+.tabs{display:flex;background:var(--ac2);border-radius:12px;padding:3px;margin:8px 0}
+.tabs button{flex:1;border:0;background:none;color:var(--mu);padding:10px;border-radius:10px;font:600 15px inherit;font-family:inherit}
+.tabs .on{background:var(--sf);color:var(--ac);box-shadow:0 1px 3px #0002}
+.nav{display:flex;align-items:center;justify-content:space-between}
+.nav b{text-transform:capitalize;font-size:17px}
+main{padding:0 16px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:8px 0;display:flex;gap:12px;cursor:pointer}
+.card .t{min-width:54px;font-weight:700;color:var(--ac)}
+.card small{color:var(--mu);display:block}
+.free{background:var(--ok);color:var(--okt);border-radius:10px;padding:6px 12px;font-size:14px;margin:6px 0}
+.empty{text-align:center;color:var(--mu);padding:40px 0}
+.fab{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:60px;height:60px;border-radius:50%;border:0;background:var(--ac);color:#fff;font-size:32px;box-shadow:0 4px 14px #0004;z-index:6}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wk .d,.mo .d{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:6px 2px;text-align:center;min-height:64px;font-size:13px;cursor:pointer}
+.mo{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.mo .d{min-height:50px}
+.d.today{border-color:var(--ac);color:var(--ac);font-weight:700}.d.sel{background:var(--ac2)}
+.dot{display:inline-block;background:var(--ac);color:#fff;border-radius:9px;padding:0 6px;font-size:11px;margin-top:3px}
+.hd{color:var(--mu);font-size:12px;text-align:center}
+.ov{position:fixed;inset:0;background:#0007;z-index:20;display:flex;align-items:flex-end}
+.sh{background:var(--bg);width:100%;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom,0px));max-width:600px;margin:auto}
+label{display:block;font-weight:600;margin:14px 0 6px;font-size:15px}
+input{width:100%;font:inherit;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);color:var(--tx)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--bd);background:var(--sf);color:var(--tx);border-radius:20px;padding:10px 14px;font:inherit;font-size:15px}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.btn{width:100%;border:0;border-radius:14px;padding:15px;font:600 17px inherit;font-family:inherit;background:var(--ac);color:#fff;margin-top:14px}
+.btn.s{background:var(--ac2);color:var(--ac)}.btn.r{background:var(--rd)}
+.sum{background:var(--ac2);border-radius:12px;padding:10px 12px;margin-top:14px;font-size:15px}
+.err{color:var(--rd);font-weight:600;margin-top:10px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)}.kv span:first-child{color:var(--mu)}
+</style></head><body>
+<header><div class="top"><h1>Minha Agenda</h1><div><button class="ib" onclick="hist()" aria-label="Histórico">🕘</button><button class="ib" onclick="cfg()" aria-label="Configurações">⚙️</button></div></div>
+<div class="tabs" id="tabs"></div><div class="nav"><button class="ib" onclick="mv(-1)">‹</button><b id="ttl"></b><button class="ib" onclick="mv(1)">›</button></div></header>
+<main id="main"></main><button class="fab" onclick="form()" aria-label="Novo agendamento">+</button><div id="modal"></div>
+<script>
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0'),DEF=[["Brow Lamination",60],["Design Tradicional",25],["Design com Henna",30],["Lash Lift",60],["Hidragloss",40]],GAP=10,NOTIFY=60;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S={procs:DEF.map((p,i)=>({id:'p'+i,name:p[0],min:p[1]})),appts:[]},view='day',cur=ds(new Date());
+try{const r=JSON.parse(localStorage.getItem('agenda')||'null');if(r&&r.procs&&r.appts)S=r}catch(e){}
+const save=()=>{try{localStorage.setItem('agenda',JSON.stringify(S))}catch(e){alert('Não foi possível salvar os dados.')}};
+function ds(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+const pd=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const ts=(d,t)=>{const[a,b,c]=d.split('-').map(Number),[h,m]=t.split(':').map(Number);return new Date(a,b-1,c,h,m).getTime()/60000};
+const hm=t=>{const d=new Date(t*60000);return pad(d.getHours())+':'+pad(d.getMinutes())};
+const dur=m=>{const h=Math.floor(m/60),r=m%60;return(h?h+'h':'')+(h&&r?' ':'')+(r?r+'min':'')};
+const fdate=s=>pd(s).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+// ---- lógica central ----
+function calc(date,time,procs){const total=procs.reduce((a,p)=>a+p.min,0),start=ts(date,time);return{total,start,endProc:start+total,end:start+total+GAP}}
+function conflict(c,ignoreId){return S.appts.find(a=>a.id!==ignoreId&&c.start<a.end&&a.start<c.end)}
+const nTime=a=>a.start-NOTIFY;
+function sorted(f){return S.appts.filter(f).sort((a,b)=>a.start-b.start)}
+const onDay=d=>sorted(a=>a.date===d);
+// ---- render ----
+function render(){
+ $('#tabs').innerHTML=[['day','Dia'],['week','Semana'],['month','Mês']].map(v=>`<button class="${view==v[0]?'on':''}" onclick="view='${v[0]}';render()">${v[1]}</button>`).join('');
+ const d=pd(cur);let h='';
+ if(view=='day'){$('#ttl').textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'short'});h=dayHtml(cur)}
+ else if(view=='week'){const s=new Date(d);s.setDate(d.getDate()-d.getDay());const e=new Date(s);e.setDate(s.getDate()+6);
+  $('#ttl').textContent=s.getDate()+' '+s.toLocaleDateString('pt-BR',{month:'short'})+' – '+e.getDate()+' '+e.toLocaleDateString('pt-BR',{month:'short'});
+  h='<div class="wk">';for(let i=0;i<7;i++){const x=new Date(s);x.setDate(s.getDate()+i);h+=cell(x)}h+='</div>'+dayHtml(cur,true)}
+ else{$('#ttl').textContent=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});const f=new Date(d.getFullYear(),d.getMonth(),1),n=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  h='<div class="mo">'+'DSTQQSS'.split('').map(x=>`<div class="hd">${x}</div>`).join('')+'<div></div>'.repeat(f.getDay());for(let i=1;i<=n;i++)h+=cell(new Date(d.getFullYear(),d.getMonth(),i));h+='</div>'+dayHtml(cur,true)}
+ $('#main').innerHTML=h}
+function cell(x){const k=ds(x),n=onDay(k).length;return`<div class="d ${k==ds(new Date())?'today':''} ${k==cur?'sel':''}" onclick="cur='${k}';render()">${view=='week'?x.toLocaleDateString('pt-BR',{weekday:'short'})+'<br>':''}${x.getDate()}${n?`<br><span class="dot">${n}</span>`:''}</div>`}
+function dayHtml(k,sub){const l=onDay(k);let h=sub?`<h3 style="text-transform:capitalize">${fdate(k)}</h3>`:'';
+ if(!l.length)return h+'<div class="empty">Nenhum agendamento.<br>Dia livre.</div>';
+ l.forEach((a,i)=>{if(i>0&&a.start>l[i-1].end)h+=`<div class="free">Livre: ${hm(l[i-1].end)} → ${hm(a.start)} (${dur(a.start-l[i-1].end)})</div>`;
+  h+=`<div class="card" onclick="det('${a.id}')"><div class="t">${hm(a.start)}</div><div><b>${esc(a.client)}</b><div>${a.procs.map(p=>esc(p.name)).join(' + ')}</div><small>${dur(a.total)} · até ${hm(a.endProc)}</small></div></div>`});
+ return h+`<div class="free">Livre a partir de ${hm(l[l.length-1].end)}</div>`}
+function mv(n){const d=pd(cur);if(view=='day')d.setDate(d.getDate()+n);else if(view=='week')d.setDate(d.getDate()+7*n);else d.setMonth(d.getMonth()+n,1);cur=ds(d);render()}
+const close=()=>$('#modal').innerHTML='';
+const sheet=h=>$('#modal').innerHTML=`<div class="ov" onclick="if(event.target==this)close()"><div class="sh">${h}</div></div>`;
+// ---- formulário ----
+let F={};
+function form(id){const a=id&&S.appts.find(x=>x.id==id);
+ F=a?{id:a.id,client:a.client,date:a.date,time:a.time,sel:a.procs.map(p=>p.pid)}:{client:'',date:cur,time:'09:00',sel:[]};drawForm()}
+function drawForm(err){const names=[...new Set(S.appts.map(a=>a.client))];
+ const pr=S.procs.filter(p=>F.sel.includes(p.id)),c=F.date&&F.time?calc(F.date,F.time,pr):null;
+ sheet(`<h2 style="margin:0">${F.id?'Editar':'Novo'} agendamento</h2>
+ <label>Cliente</label><input id="fc" list="nm" value="${esc(F.client)}" placeholder="Nome da cliente" oninput="F.client=this.value"><datalist id="nm">${names.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+ <label>Procedimentos</label><div class="chips">${S.procs.map(p=>`<button class="chip ${F.sel.includes(p.id)?'on':''}" onclick="tg('${p.id}')">${esc(p.name)} · ${dur(p.min)}</button>`).join('')}</div>
+ <div class="row"><div><label>Data</label><input type="date" value="${F.date}" onchange="F.date=this.value;drawForm()"></div><div><label>Hora</label><input type="time" value="${F.time}" onchange="F.time=this.value;drawForm()"></div></div>
+ ${c&&pr.length?`<div class="sum"><b>${dur(c.total)}</b> de procedimentos + ${GAP}min de intervalo<br>Atendimento: ${hm(c.start)} → ${hm(c.endProc)}<br>Próximo horário livre: <b>${hm(c.end)}</b><br>Notificação: ${hm(c.start-NOTIFY)}</div>`:''}
+ ${err?`<div class="err">${err}</div>`:''}
+ <button class="btn" onclick="sv()">Salvar agendamento</button><button class="btn s" onclick="close()">Cancelar</button>`)}
+function tg(id){F.sel=F.sel.includes(id)?F.sel.filter(x=>x!=id):[...F.sel,id];drawForm()}
+function sv(){const cl=F.client.trim();if(!cl)return drawForm('Informe o nome da cliente.');if(!F.sel.length)return drawForm('Selecione ao menos um procedimento.');if(!F.date||!F.time)return drawForm('Informe data e hora.');
+ const procs=S.procs.filter(p=>F.sel.includes(p.id)).map(p=>({pid:p.id,name:p.name,min:p.min})),c=calc(F.date,F.time,procs),k=conflict(c,F.id);
+ if(k)return drawForm(`Conflito com ${esc(k.client)} (${hm(k.start)} → ${hm(k.end)}, já com o intervalo). Horário livre a partir de ${hm(k.end)}.`);
+ const a={id:F.id||'a'+Date.now()+Math.random().toString(36).slice(2,6),client:cl,date:F.date,time:F.time,procs,total:c.total,gap:GAP,start:c.start,endProc:c.endProc,end:c.end,notifyAt:c.start-NOTIFY,status:'ativo',notified:false};
+ S.appts=S.appts.filter(x=>x.id!==a.id).concat(a);save();cur=F.date;close();render();askPerm();check()}
+// ---- detalhes ----
+function det(id){const a=S.appts.find(x=>x.id==id);if(!a)return;
+ sheet(`<h2 style="margin:0">${esc(a.client)}</h2><div style="margin-top:8px">
+ <div class="kv"><span>Data</span><span style="text-transform:capitalize">${fdate(a.date)}</span></div><div class="kv"><span>Horário</span><span>${hm(a.start)}</span></div>
+ <div class="kv"><span>Procedimentos</span><span style="text-align:right">${a.procs.map(p=>esc(p.name)+' ('+dur(p.min)+')').join('<br>')}</span></div>
+ <div class="kv"><span>Duração total</span><span>${dur(a.total)}</span></div><div class="kv"><span>Termina às</span><span>${hm(a.endProc)}</span></div>
+ <div class="kv"><span>Próximo atendimento a partir de</span><span><b>${hm(a.end)}</b></span></div><div class="kv"><span>Notificação</span><span>${hm(a.notifyAt)}</span></div></div>
+ <button class="btn" onclick="form('${a.id}')">Editar</button><button class="btn r" onclick="del('${a.id}')">Excluir</button><button class="btn s" onclick="close()">Fechar</button>`)}
+function del(id){sheet(`<h2 style="margin:0">Tem certeza que deseja excluir este agendamento?</h2><button class="btn r" onclick="S.appts=S.appts.filter(x=>x.id!='${id}');save();close();render()">Excluir</button><button class="btn s" onclick="close()">Cancelar</button>`)}
+// ---- histórico ----
+function hist(q=''){const l=q?sorted(a=>a.client.toLowerCase().includes(q.toLowerCase())).reverse():[];
+ sheet(`<h2 style="margin:0">Histórico por cliente</h2><label>Nome da cliente</label><input id="hq" value="${esc(q)}" placeholder="Digite o nome" oninput="hist(this.value);const e=$('#hq');e.focus();e.setSelectionRange(99,99)">
+ ${l.map(a=>`<div class="card" onclick="det('${a.id}')"><div class="t">${pd(a.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})}</div><div><b>${esc(a.client)}</b><div>${a.procs.map(p=>esc(p.name)).join(' + ')}</div><small>${hm(a.start)} · ${dur(a.total)}</small></div></div>`).join('')||(q?'<div class="empty">Nada encontrado.</div>':'')}
+ <button class="btn s" onclick="close()">Fechar</button>`)}
+// ---- configurações ----
+function cfg(){sheet(`<h2 style="margin:0">Configurações</h2><label>Procedimentos e durações (minutos)</label>
+ ${S.procs.map(p=>`<div class="row" style="margin-bottom:8px"><input value="${esc(p.name)}" onchange="up('${p.id}','name',this.value)" style="flex:2"><input type="number" min="1" inputmode="numeric" value="${p.min}" onchange="up('${p.id}','min',this.value)"></div>`).join('')}
+ <button class="btn s" onclick="S.procs.push({id:'p'+Date.now(),name:'Novo procedimento',min:30});save();cfg()">+ Adicionar procedimento</button>
+ <p style="color:var(--mu);font-size:14px">Alterar a duração vale para novos agendamentos; os já marcados mantêm a duração original.</p>
+ <label>Notificações</label><div class="sum">Avisar 1 hora antes de cada agendamento.<br><small id="ps"></small></div>
+ <button class="btn s" onclick="askPerm(true)">Permitir notificações</button>
+ <label>Backup</label><button class="btn s" onclick="exp()">Exportar backup</button><button class="btn s" onclick="$('#imp').click()">Importar backup</button><input id="imp" type="file" accept=".json" hidden onchange="imp(this.files[0])">
+ <button class="btn" onclick="close()">Fechar</button>`);perm()}
+function up(id,k,v){const p=S.procs.find(x=>x.id==id);if(k=='min'){v=parseInt(v);if(!(v>0))return cfg();}else if(!v.trim())return cfg();p[k]=v;save()}
+function exp(){const b=new Blob([JSON.stringify(S)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='agenda-backup-'+ds(new Date())+'.json';a.click()}
+function imp(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j.procs||!j.appts)throw 0;S=j;save();close();render()}catch(e){alert('Arquivo de backup inválido.')}};r.readAsText(f)}
+// ---- notificações ----
+function perm(){const e=$('#ps');if(e)e.textContent='Permissão: '+(('Notification'in window)?{granted:'concedida',denied:'negada',default:'ainda não solicitada'}[Notification.permission]:'não suportado neste navegador')}
+function askPerm(f){if('Notification'in window&&(Notification.permission=='default'||f))Notification.requestPermission().then(perm)}
+function check(){if(!('Notification'in window)||Notification.permission!='granted')return;const now=Date.now()/60000;let ch=0;
+ S.appts.forEach(a=>{if(!a.notified&&a.notifyAt<=now&&a.start>now-60){a.notified=true;ch=1;
+  const o={body:`Cliente: ${a.client}\nProcedimento${a.procs.length>1?'s':''}: ${a.procs.map(p=>p.name).join(' + ')}\nHorário: ${hm(a.start)}`,tag:a.id};
+  try{if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.ready.then(r=>r.showNotification('Agendamento próximo',o));else new Notification('Agendamento próximo',o)}catch(e){}}});if(ch)save()}
+setInterval(check,15000);document.addEventListener('visibilitychange',check);
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+render();check();
+</script></body></html>
